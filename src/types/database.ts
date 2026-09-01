@@ -93,8 +93,8 @@ export type Incident = {
   type: IncidentType;
   status: IncidentStatus;
   description: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   location_text: string | null;
   people_affected: number;
   required_capabilities: string[];
@@ -118,8 +118,8 @@ export type IncidentInsert = {
   type?: IncidentType;
   status?: IncidentStatus;
   description: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   location_text?: string | null;
   people_affected?: number;
   required_capabilities?: string[];
