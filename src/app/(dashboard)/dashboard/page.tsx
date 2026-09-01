@@ -1,21 +1,26 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Badge } from "@/components/ui/Badge";
+import { OverviewIncidentQueue } from "@/components/dashboard/OverviewIncidentQueue";
+
 
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  const [incidents, teams, shelters] = await Promise.all([
-    supabase
-  .from("incidents")
-  .select(
-    "id, incident_number, severity, type, status, description, location_text, reported_at"
-  )
-  .order("reported_at", { ascending: false })
-  .limit(10),
-    supabase.from("resource_teams").select("status"),
-    supabase.from("shelters").select("total_capacity, current_occupancy"),
-  ]);
+  const [incidents, assignments, teams, shelters] = await Promise.all([
+  supabase
+    .from("incidents")
+    .select(
+      "id, incident_number, severity, type, status, description, location_text, reported_at, people_affected, confidence_score"
+    )
+    .order("reported_at", { ascending: false })
+    .limit(10),
+
+  supabase.from("assignments").select("*"),
+
+  supabase.from("resource_teams").select("status"),
+
+  supabase.from("shelters").select("total_capacity, current_occupancy"),
+]);
 
   const activeIncidents = (incidents.data ?? []).filter(
     (i) => !["RESOLVED", "CANCELLED"].includes(i.status)
@@ -65,34 +70,12 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-8 text-lg font-semibold">Recent Incidents</h2>
-      <div className="space-y-2">
-        {(incidents.data ?? []).map((i) => (
-  <Link
-    key={i.incident_number}
-    href={`/dashboard/incidents?incident=${encodeURIComponent(i.id)}`}
-    className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-sm transition-colors hover:border-[var(--color-accent)] hover:bg-gray-50"
-  >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-xs text-muted">{i.incident_number}</span>
-                <Badge label={i.severity} color={i.severity} />
-                <span className="text-sm">{i.type.replace(/_/g, " ")}</span>
-              </div>
-              <p className="mt-1 truncate text-sm text-muted">
-                {i.description}
-                {i.location_text ? ` · ${i.location_text}` : ""}
-              </p>
-            </div>
-            <Badge label={i.status} color={i.status === "REPORTED" ? "MEDIUM" : i.status} />
-          </Link>
-        ))}
-        {!incidents.data?.length && (
-          <p className="rounded-xl border border-dashed border-[var(--color-border)] p-8 text-center text-sm text-muted">
-            No incidents yet. Seed the database to see demo data.
-          </p>
-        )}
-      </div>
+      <h1 className="mb-3 mt-8 text-lg font-semibold">Recent Incidents</h1>
+      <OverviewIncidentQueue
+  incidents={incidents.data ?? []}
+  assignments={assignments.data ?? []}
+/>
+      
     </div>
   );
 }
