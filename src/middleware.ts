@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 
 // ---------------------------------------------------------------------------
 // Real Next.js middleware (must be src/middleware.ts for Next.js to pick it up)
-// Optimistic auth check — real authorization is enforced by each layout and
-// by Supabase RLS.
+// This is an optimistic auth gate; the actual authorization checks still happen
+// in the route layouts and Supabase RLS.
 // ---------------------------------------------------------------------------
 
 const PROTECTED_PREFIXES = [
@@ -21,7 +21,6 @@ export function middleware(request: NextRequest) {
     .getAll()
     .some((c) => c.name.startsWith("sb-") && c.name.includes("auth-token"));
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
   // 1. Unauthenticated user tries a protected route ? redirect to /login

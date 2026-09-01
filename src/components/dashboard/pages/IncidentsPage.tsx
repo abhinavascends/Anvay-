@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLiveData } from "@/hooks/useLiveData";
 import { IncidentListPanel, type IncidentFilter } from "../IncidentListPanel";
 import { IncidentDetailPanel } from "../IncidentDetailPanel";
@@ -8,9 +9,17 @@ import { IncidentDetailPanel } from "../IncidentDetailPanel";
 // Full-page incidents management view (list + detail side by side)
 export function IncidentsPage() {
   const { incidents, teams, shelters, assignments, connected, refresh } = useLiveData();
+
+  const searchParams = useSearchParams();
+  const incidentIdFromUrl = searchParams.get("incident");
+
   const [filter, setFilter] = useState<IncidentFilter>("ACTIVE");
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(
+  incidentIdFromUrl
+);
+  
+
 
   const selected = incidents.find((i) => i.id === selectedId) ?? null;
 

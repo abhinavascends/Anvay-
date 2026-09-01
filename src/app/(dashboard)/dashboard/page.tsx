@@ -7,10 +7,12 @@ export default async function DashboardPage() {
 
   const [incidents, teams, shelters] = await Promise.all([
     supabase
-      .from("incidents")
-      .select("incident_number, severity, type, status, description, location_text, reported_at")
-      .order("reported_at", { ascending: false })
-      .limit(10),
+  .from("incidents")
+  .select(
+    "id, incident_number, severity, type, status, description, location_text, reported_at"
+  )
+  .order("reported_at", { ascending: false })
+  .limit(10),
     supabase.from("resource_teams").select("status"),
     supabase.from("shelters").select("total_capacity, current_occupancy"),
   ]);
@@ -66,10 +68,11 @@ export default async function DashboardPage() {
       <h2 className="mb-3 mt-8 text-lg font-semibold">Recent Incidents</h2>
       <div className="space-y-2">
         {(incidents.data ?? []).map((i) => (
-          <div
-            key={i.incident_number}
-            className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-sm"
-          >
+  <Link
+    key={i.incident_number}
+    href={`/dashboard/incidents?incident=${encodeURIComponent(i.id)}`}
+    className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-white p-4 shadow-sm transition-colors hover:border-[var(--color-accent)] hover:bg-gray-50"
+  >
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xs text-muted">{i.incident_number}</span>
@@ -82,7 +85,7 @@ export default async function DashboardPage() {
               </p>
             </div>
             <Badge label={i.status} color={i.status === "REPORTED" ? "MEDIUM" : i.status} />
-          </div>
+          </Link>
         ))}
         {!incidents.data?.length && (
           <p className="rounded-xl border border-dashed border-[var(--color-border)] p-8 text-center text-sm text-muted">
