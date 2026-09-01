@@ -1,0 +1,18 @@
+{
+  "name": "RakshaSetu — Emergency Help",
+  "short_name": "RakshaSetu",
+  "description": "Report emergencies and get help fast",
+  "start_url": "/report",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#dc2626",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
