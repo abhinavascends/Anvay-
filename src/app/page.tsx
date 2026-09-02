@@ -79,7 +79,7 @@ export default async function Home({
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2">
             <Logo size={48} />
-            <span className="text-base font-bold tracking-tight">RakshaSetu</span>
+            <span className="text-base font-bold tracking-tight">Anvay</span>
           </Link>
           {signedIn ? (
             <Link
@@ -125,7 +125,7 @@ export default async function Home({
             — from first report to resolved.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-            RakshaSetu turns citizen reports into prioritized incidents, and
+            Anvay turns citizen reports into prioritized incidents, and
             incidents into optimally assigned rescue teams — live, on a real
             map of your district.
           </p>
@@ -198,12 +198,12 @@ export default async function Home({
 
         {/* About */}
         <section className="mx-auto max-w-3xl px-4 py-14 text-center sm:px-6">
-          <h2 className="text-2xl font-bold sm:text-3xl">About RakshaSetu</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">About Anvay</h2>
           <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
             In a disaster, the hardest problems aren&apos;t alerts — SACHET
             already sends those. They&apos;re coordination problems: which of
             the 47 incoming reports matter most, which boat should go where,
-            and is that shelter actually full? RakshaSetu answers all three in
+            and is that shelter actually full? Anvay answers all three in
             realtime, combining citizen reports, official weather warnings and
             resource inventories into a single operating picture for district
             authorities — with SMS fallback for citizens who can&apos;t install
@@ -218,7 +218,7 @@ export default async function Home({
           <div>
             <div className="flex items-center gap-2">
               <Logo size={40} />
-              <b className="text-base">RakshaSetu</b>
+              <b className="text-base">Anvay</b>
             </div>
             <p className="mt-2 text-xs leading-relaxed text-muted">
               Real-Time Disaster Response Coordination &amp; Resource

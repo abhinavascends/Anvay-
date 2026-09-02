@@ -75,7 +75,7 @@ export default function CitizenDashboard() {
             <Logo size={48} />
             <div className="min-w-0">
               <div className="truncate text-sm font-bold leading-tight">
-                RakshaSetu
+                Anvay
               </div>
               <div className="flex items-center gap-1.5 text-xs text-muted">
                 <span

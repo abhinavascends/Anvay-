@@ -1,8 +1,8 @@
-# 🛟 RakshaSetu — Real-Time Disaster Response Coordination & Resource Optimization Platform
+# Anvay — National Disaster Saviour
 
 > **"We convert fragmented disaster reports into prioritized, actionable rescue assignments in real time."**
 
-RakshaSetu is a district-level **decision-support system** for disaster response. It fuses citizen reports, official weather warnings, and live resource inventory into a single geospatial situation picture — then uses a transparent multi-factor **allocation engine** to recommend *which* rescue team should respond to *which* incident first.
+Anvay is a district-level **decision-support system** for disaster response. It fuses citizen reports, official weather warnings, and live resource inventory into a single geospatial situation picture — then uses a transparent multi-factor **allocation engine** to recommend *which* rescue team should respond to *which* incident first.
 
 **SIH Problem Statement:** PS-05 — Real-Time Disaster Early-Warning & Resource Coordination Platform
 
@@ -12,13 +12,13 @@ RakshaSetu is a district-level **decision-support system** for disaster response
 
 ## ⚠️ The One-Line Positioning (read this first)
 
-RakshaSetu is **not another alert app**. India already has SACHET/NDMA for warning dissemination. We are the **operational coordination layer that comes after the warning**: incoming incident → AI-assisted triage → confidence scoring → optimal resource assignment → live reassignment when conditions change.
+Anvay is **not another alert app**. India already has SACHET/NDMA for warning dissemination. We are the **operational coordination layer that comes after the warning**: incoming incident → AI-assisted triage → confidence scoring → optimal resource assignment → live reassignment when conditions change.
 
 ---
 
-## 🆚 How RakshaSetu Is Different From Existing Platforms
+## How Anvay Is Different From Existing Platforms
 
-| Capability | SACHET / NDMA | IMD Portals | Ushahidi | GDACS | **RakshaSetu** |
+| Capability | SACHET / NDMA | IMD Portals | Ushahidi | GDACS | **Anvay** |
 |---|:---:|:---:|:---:|:---:|:---:|
 | Official geo-targeted alerts | ✅ | ✅ | ❌ | ✅ | ✅ (consumes IMD feed) |
 | Citizen report submission | Limited | ❌ | ✅ | ❌ | ✅ App + PWA + **SMS fallback** |

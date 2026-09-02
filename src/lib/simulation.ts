@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 // ============================================================
-// RakshaSetu Disaster Simulation Engine
+// Anvay Disaster Simulation Engine
 //
 // Replays a scripted flood scenario into the live system so the
 // demo never depends on real disasters or external APIs.

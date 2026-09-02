@@ -154,7 +154,7 @@ function applyChange<T extends { id: string }>(
       }
       case "UPDATE": {
         const row = payload.new as T;
-        return prev.map((r) => (r.id === row.id ? row : r));
+        return prev.map((r) => (r.id === row.id ? { ...r, ...row } : r));
       }
       case "DELETE": {
         const old = payload.old as { id?: string };

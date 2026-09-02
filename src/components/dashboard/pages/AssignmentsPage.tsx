@@ -86,6 +86,32 @@ export function AssignmentsPage() {
               <p className="mt-1.5 line-clamp-1 text-sm text-muted">{incident.description}</p>
             )}
 
+            {incident && (
+              <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted">
+                <time dateTime={incident.reported_at}>
+                  Reported {new Date(incident.reported_at).toLocaleString()}
+                </time>
+                <time dateTime={a.assigned_at}>
+                  Assigned {new Date(a.assigned_at).toLocaleString()}
+                </time>
+                {a.acknowledged_at && (
+                  <time dateTime={a.acknowledged_at}>
+                    Acknowledged {new Date(a.acknowledged_at).toLocaleString()}
+                  </time>
+                )}
+                {a.arrived_at && (
+                  <time dateTime={a.arrived_at}>
+                    On scene {new Date(a.arrived_at).toLocaleString()}
+                  </time>
+                )}
+                {a.completed_at && (
+                  <time dateTime={a.completed_at}>
+                    Completed {new Date(a.completed_at).toLocaleString()}
+                  </time>
+                )}
+              </div>
+            )}
+
             <div className="mt-1.5 flex flex-wrap gap-x-4 text-xs text-muted">
               {a.distance_km != null && <span> {a.distance_km} km</span>}
               {a.eta_minutes != null && <span> ETA {a.eta_minutes} min</span>}

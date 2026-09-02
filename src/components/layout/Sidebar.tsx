@@ -57,7 +57,7 @@ export function Sidebar({
         <Logo size={40} />
         <div className="hidden min-w-0 lg:block">
           <div className="truncate text-sm font-bold leading-tight">
-            RakshaSetu
+            Anvay
           </div>
           <div className="text-xs text-muted">Control Room</div>
         </div>

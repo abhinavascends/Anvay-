@@ -460,6 +460,13 @@ export function OverviewIncidentQueue({
                           {Math.round(incident.confidence_score * 100)}%
                         </span>
                       </div>
+
+                      <time
+                        dateTime={incident.reported_at}
+                        className="mt-1 block text-[11px] text-muted"
+                      >
+                        Reported {new Date(incident.reported_at).toLocaleString()}
+                      </time>
                     </div>
 
                     <div className="shrink-0">
