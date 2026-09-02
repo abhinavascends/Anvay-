@@ -4,33 +4,37 @@ import { jsonError } from "@/lib/auth";
 import { parseSms } from "@/lib/sms";
 import { DEFAULT_REPORT_LOCATION } from "@/config/city";
 
-// POST /api/sms/incoming
-//
-// Connectivity-fallback channel: an SMS gateway (Twilio, Gupshup, or the
-// demo simulator) posts inbound citizen SMS here. No user session exists
-// on this path, so we authenticate with a shared webhook secret.
-//
-// Body: { from: string, text: string }
 export async function POST(request: NextRequest) {
   const secret = process.env.SMS_WEBHOOK_SECRET;
   if (secret && request.headers.get("x-sms-secret") !== secret) {
     return jsonError("Invalid webhook secret", 401);
   }
 
-  let body: {
-    from?: string;
-    text?: string;
-    latitude?: number;
-    longitude?: number;
-    location_text?: string;
-  };
-  try {
-    body = await request.json();
-  } catch {
-    return jsonError("Invalid JSON body");
+  const contentType = request.headers.get("content-type") ?? "";
+  let from: string | undefined;
+  let text: string;
+  let latitude: number | undefined;
+  let longitude: number | undefined;
+  let location_text: string | undefined;
+
+  if (contentType.includes("application/json")) {
+    const body = await request.json();
+    from = body.from;
+    text = typeof body.text === "string" ? body.text : "";
+    latitude = body.latitude;
+    longitude = body.longitude;
+    location_text = body.location_text;
+  } else {
+    const formData = await request.formData();
+    from = formData.get("From")?.toString();
+    text = formData.get("Body")?.toString() ?? "";
+    const lat = formData.get("Latitude");
+    latitude = lat ? Number(lat) : undefined;
+    const lon = formData.get("Longitude");
+    longitude = lon ? Number(lon) : undefined;
+    location_text = formData.get("location_text")?.toString() ?? undefined;
   }
 
-  const text = typeof body.text === "string" ? body.text : "";
   if (!text) return jsonError("text is required");
 
   const parsed = parseSms(text);
@@ -38,13 +42,12 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient();
 
-  // Resolve reporter by phone number when known
   let reporterId: string | null = null;
-  if (body.from) {
+  if (from) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("id")
-      .eq("phone", body.from)
+      .eq("phone", from)
       .maybeSingle();
     reporterId = profile?.id ?? null;
   }
@@ -54,9 +57,9 @@ export async function POST(request: NextRequest) {
     .insert({
       reporter_id: reporterId,
       description: parsed.description,
-      latitude: Number(body.latitude) || DEFAULT_REPORT_LOCATION.latitude,
-      longitude: Number(body.longitude) || DEFAULT_REPORT_LOCATION.longitude,
-      location_text: body.location_text ?? null,
+      latitude: latitude ?? DEFAULT_REPORT_LOCATION.latitude,
+      longitude: longitude ?? DEFAULT_REPORT_LOCATION.longitude,
+      location_text: location_text ?? null,
       people_affected: parsed.peopleAffected,
       severity: parsed.severity,
       type: parsed.type,
