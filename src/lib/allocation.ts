@@ -6,7 +6,7 @@ import type {
 } from "@/types/database";
 
 // ============================================================
-// RakshaSetu Allocation Engine
+// Anvay Allocation Engine
 //
 // Transparent, weighted multi-factor scoring:
 //   Score = w.sev*Severity + w.eta*ETA + w.cap*Capability

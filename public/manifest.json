@@ -1,6 +1,6 @@
 {
-  "name": "RakshaSetu — Emergency Help",
-  "short_name": "RakshaSetu",
+  "name": "Anvay : National Disaster Saviour",
+  "short_name": "Anvay",
   "description": "Report emergencies and get help fast",
   "start_url": "/report",
   "display": "standalone",
@@ -9,9 +9,9 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "/anvay.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

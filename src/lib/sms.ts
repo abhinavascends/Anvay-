@@ -1,5 +1,5 @@
 // ============================================================
-// RakshaSetu SMS Parser (connectivity-fallback channel)
+// Anvay SMS Parser (connectivity-fallback channel)
 //
 // Expected format: "SOS <TYPE> <free text> [N] people"
 // Examples:

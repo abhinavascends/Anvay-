@@ -1,5 +1,5 @@
 // ============================================================
-// RakshaSetu — District configuration
+// Anvay — District configuration
 //
 // Change these values to redeploy the platform for another city.
 // After editing:

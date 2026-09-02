@@ -196,6 +196,16 @@ export type Assignment = {
   updated_at: string;
 }
 
+export type IncidentActivity = {
+  id: string;
+  incident_id: string;
+  action_type: string;
+  message: string;
+  actor_type: "citizen" | "operator" | "rescue_team" | "system";
+  actor_id: string | null;
+  created_at: string;
+}
+
 export type AssignmentLog = {
   id: string;
   assignment_id: string;
@@ -264,6 +274,7 @@ export type Database = {
       shelter_stocks: Table<ShelterStock>;
       assignments: Table<Assignment>;
       assignment_logs: Table<AssignmentLog>;
+      incident_activity: Table<IncidentActivity>;
       alerts: Table<Alert>;
       allocation_weights: Table<AllocationWeight>;
     };

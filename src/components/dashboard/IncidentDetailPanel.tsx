@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { haversineKm, etaMinutes } from "@/lib/allocation";
 import type {
   Assignment,
+  IncidentActivity,
   Incident,
   ResourceTeam,
   Shelter,
@@ -33,6 +34,37 @@ const SEV_COLORS: Record<string, string> = {
   LOW: "text-[var(--color-low)]",
 };
 
+function mergeActivity(
+  current: IncidentActivity[],
+  incoming: IncidentActivity[]
+): IncidentActivity[] {
+  const byId = new Map(current.map((event) => [event.id, event]));
+  incoming.forEach((event) => byId.set(event.id, event));
+  return [...byId.values()].sort(
+    (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
+  );
+}
+
+function activityActor(actorType: IncidentActivity["actor_type"]): string {
+  switch (actorType) {
+    case "citizen":
+      return "Citizen";
+    case "rescue_team":
+      return "Rescue team";
+    case "operator":
+      return "Operator";
+    default:
+      return "System";
+  }
+}
+
+type TimelineEntry = {
+  id: string;
+  message: string;
+  actor: string;
+  created_at: string;
+};
+
 export function IncidentDetailPanel({
   incident,
   teams,
@@ -55,10 +87,78 @@ export function IncidentDetailPanel({
   const [error, setError] = useState<string | null>(null);
   const [manualPick, setManualPick] = useState("");
   const [lightbox, setLightbox] = useState(false);
+  const [activity, setActivity] = useState<IncidentActivity[]>([]);
+  const incidentId = incident?.id;
 
   const activeAssignment = incident
     ? assignments.find((a) => a.incident_id === incident.id)
 : undefined;
+
+  const timelineEntries = useMemo<TimelineEntry[]>(() => {
+    if (activity.length > 0) {
+      return activity.map((event) => ({
+        id: event.id,
+        message: event.message,
+        actor: activityActor(event.actor_type),
+        created_at: event.created_at,
+      }));
+    }
+
+    const entries: TimelineEntry[] = [
+      {
+        id: `${incident?.id ?? "incident"}-reported`,
+        message: "Incident reported",
+        actor: "Citizen",
+        created_at: incident?.reported_at ?? "",
+      },
+    ];
+
+    if (incident && incident.updated_at !== incident.reported_at) {
+      entries.push({
+        id: `${incident.id}-updated`,
+        message: "Incident last updated",
+        actor: "System",
+        created_at: incident.updated_at,
+      });
+    }
+
+    if (activeAssignment) {
+      entries.push({
+        id: `${activeAssignment.id}-assigned`,
+        message: "Team assigned",
+        actor: "Operator",
+        created_at: activeAssignment.assigned_at,
+      });
+      if (activeAssignment.acknowledged_at) {
+        entries.push({
+          id: `${activeAssignment.id}-acknowledged`,
+          message: "Team acknowledged",
+          actor: "Rescue team",
+          created_at: activeAssignment.acknowledged_at,
+        });
+      }
+      if (activeAssignment.arrived_at) {
+        entries.push({
+          id: `${activeAssignment.id}-arrived`,
+          message: "Team arrived on scene",
+          actor: "Rescue team",
+          created_at: activeAssignment.arrived_at,
+        });
+      }
+      if (activeAssignment.completed_at) {
+        entries.push({
+          id: `${activeAssignment.id}-completed`,
+          message: "Incident response completed",
+          actor: "Rescue team",
+          created_at: activeAssignment.completed_at,
+        });
+      }
+    }
+
+    return entries.sort(
+      (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)
+    );
+  }, [activity, activeAssignment, incident]);
 
   // Nearest shelters with free capacity - shelters that can absorb
   // everyone affected rank before partial-capacity ones, then distance.
@@ -109,6 +209,53 @@ export function IncidentDetailPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incident?.id, incident?.status]);
 
+  useEffect(() => {
+    if (!incidentId) return;
+
+    let cancelled = false;
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`incident-activity-${incidentId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "incident_activity",
+          filter: `incident_id=eq.${incidentId}`,
+        },
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            const deletedId = (payload.old as { id?: string }).id;
+            if (deletedId) {
+              setActivity((current) => current.filter((event) => event.id !== deletedId));
+            }
+            return;
+          }
+
+          const nextEvent = payload.new as IncidentActivity;
+          setActivity((current) => mergeActivity(current, [nextEvent]));
+        }
+      )
+      .subscribe();
+
+    void (async () => {
+      const { data } = await supabase
+        .from("incident_activity")
+        .select("*")
+        .eq("incident_id", incidentId)
+        .order("created_at", { ascending: false });
+      if (!cancelled) {
+        setActivity((current) => mergeActivity(current, data ?? []));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      void supabase.removeChannel(channel);
+    };
+  }, [incidentId]);
+
   const allocate = useCallback(async (incidentId: string) => {
     setLoading(true);
     setError(null);
@@ -138,16 +285,17 @@ export function IncidentDetailPanel({
     setManualPick("");
     setError(null);
     setLightbox(false);
+    setActivity([]);
   }
 
   useEffect(() => {
     // Defer allocation fetch so setState never runs synchronously
-    if (incident && !isClosed && !activeAssignment && recs.length === 0)
+    if (incidentId && !isClosed && !activeAssignment && recs.length === 0)
       void (async () => {
-        await allocate(incident.id);
+        await allocate(incidentId);
       })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [incident?.id]);
+  }, [incidentId]);
 
   async function assign(resourceId: string, rec?: Recommendation) {
     if (!incident) return;
@@ -232,6 +380,26 @@ export function IncidentDetailPanel({
           📷 No photo attached to this report
         </div>
       )}
+
+      <div className="mb-3 rounded-lg border border-[var(--color-border)] bg-gray-50 p-3">
+        <div className="text-xs font-semibold uppercase tracking-wide text-muted">
+          Activity / Timeline
+        </div>
+        <ol className="mt-2 space-y-2">
+          {timelineEntries.map((entry) => (
+            <li key={entry.id} className="text-xs">
+              <div className="font-medium">{entry.message}</div>
+              <div className="mt-0.5 text-muted">
+                <time dateTime={entry.created_at}>
+                  {new Date(entry.created_at).toLocaleString()}
+                </time>
+                {" · "}
+                {entry.actor}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
 
       {!isClosed && suggestedShelters.length > 0 && (
         <div className="mb-3 rounded-lg border border-[var(--color-border)] bg-white p-3 shadow-sm">

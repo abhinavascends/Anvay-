@@ -5,20 +5,20 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RakshaSetu — Disaster Response Coordination",
+  title: "Anvay : National Disaster Saviour",
   description:
     "Real-time disaster early-warning and resource coordination platform",
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/logo.png", sizes: "32x32", type: "image/png" },
-      { url: "/logo.png", sizes: "192x192", type: "image/png" },
-      { url: "/logo.png", sizes: "512x512", type: "image/png" },
+      { url: "/anvay.png", sizes: "32x32", type: "image/png" },
+      { url: "/anvay.png", sizes: "192x192", type: "image/png" },
+      { url: "/anvay.png", sizes: "512x512", type: "image/png" },
     ],
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    shortcut: "/anvay.png",
+    apple: "/anvay.png",
   },
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "RakshaSetu" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Anvay" },
 };
 
 export const viewport: Viewport = {
