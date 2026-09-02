@@ -7,7 +7,10 @@ Anvay is a district-level **decision-support system** for disaster response. It 
 **SIH Problem Statement:** PS-05 — Real-Time Disaster Early-Warning & Resource Coordination Platform
 
 > 🗺️ **Demo district:** Rourkela, Odisha (Koel river flood scenario). District-specific data lives in `src/config/city.ts` + `supabase/seed.sql` — edit both to redeploy for any other district.
-
+operator1@gov.in : Password - operator@1
+> citizen1@gmail.com : Password - citizen@1
+> rescue1@gov.in : Password - rescue@1
+> shelter1@gov.in : Password - shelter@1
 ---
 
 ## ⚠️ The One-Line Positioning (read this first)
