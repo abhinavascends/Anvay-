@@ -63,14 +63,16 @@ export function IncidentDetailPanel({
   // Nearest shelters with free capacity - shelters that can absorb
   // everyone affected rank before partial-capacity ones, then distance.
   const suggestedShelters = useMemo(() => {
-    if (!incident) return [];
+    if (!incident || incident.latitude == null || incident.longitude == null) return [];
+    const incidentLatitude = incident.latitude;
+    const incidentLongitude = incident.longitude;
     return shelters
       .map((s) => ({
         shelter: s,
         free: s.total_capacity - s.current_occupancy,
         distanceKm: haversineKm(
-          incident.latitude,
-          incident.longitude,
+          incidentLatitude,
+          incidentLongitude,
           s.latitude,
           s.longitude
         ),
@@ -188,6 +190,8 @@ export function IncidentDetailPanel({
 
   if (!incident) return null;
 
+  const photoUrl = incident.photo_url;
+  const hasPhoto = typeof photoUrl === "string" && photoUrl.trim().length > 0;
   const shown = showAll ? recs: recs.slice(0, 3);
 
   return (
@@ -205,26 +209,31 @@ export function IncidentDetailPanel({
       <p className="mb-2 text-sm">{incident.description}</p>
 
       <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-muted">
-        <div> {incident.location_text ?? `${incident.latitude.toFixed(4)}, ${incident.longitude.toFixed(4)}`}</div>
+        <div>
+          {incident.location_text ??
+            (incident.latitude != null && incident.longitude != null
+              ? `${incident.latitude.toFixed(4)}, ${incident.longitude.toFixed(4)}`
+              : "Location unavailable")}
+        </div>
         <div> {incident.people_affected} people affected</div>
         <div> Needs: {incident.required_capabilities.join(", ") || "general"}</div>
         <div> Confidence: {Math.round(incident.confidence_score * 100)}%</div>
       </div>
 
-      {incident.photo_url ? (
+      {hasPhoto ? (
         <button
           onClick={() => setLightbox(true)}
-          className="relative mb-3 block w-full overflow-hidden rounded-lg border border-[var(--color-border)]"
+          className="relative mb-3 block w-full shrink-0 overflow-hidden rounded-lg border border-[var(--color-border)]"
           title="Click to enlarge"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={incident.photo_url}
+            src={photoUrl}
             alt={`Citizen photo for ${incident.incident_number}`}
-            className="h-36 w-full cursor-zoom-in object-cover"
+            className="h-40 w-full cursor-zoom-in object-cover"
           />
           <span className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
-            📷 citizen photo
+            📷 Citizen photo
           </span>
         </button>
       ) : (
@@ -332,7 +341,7 @@ export function IncidentDetailPanel({
             const team = teams.find((t) => t.id === activeAssignment.resource_id);
             const km =
               activeAssignment.distance_km ??
-              (team && incident
+              (team && incident && incident.latitude != null && incident.longitude != null
                 ? haversineKm(
                     team.latitude,
                     team.longitude,
@@ -506,20 +515,24 @@ export function IncidentDetailPanel({
           </div>
         </div>
       )}
-      {lightbox && incident.photo_url && (
+      {lightbox && hasPhoto && (
         <div
           className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/85 p-6"
           onClick={() => setLightbox(false)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={incident.photo_url}
+            src={photoUrl}
             alt={`Citizen photo for ${incident.incident_number}`}
             className="max-h-[88vh] max-w-full rounded-lg object-contain shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
           />
           <button
             className="absolute right-4 top-4 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white hover:bg-white/20"
-            onClick={() => setLightbox(false)}
+            onClick={(event) => {
+              event.stopPropagation();
+              setLightbox(false);
+            }}
           >
             ✕ Close
           </button>
