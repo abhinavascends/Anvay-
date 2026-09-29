@@ -10,7 +10,7 @@ Anvay is a district-level **decision-support system** for disaster response. It 
 > 
 > DUMMY CREDENTIALS FOR DEMO
 > 
-operator1@gov.in : Password - operator@1  
+> operator1@gov.in : Password - operator@1  
 
 > citizen1@gmail.com : Password - citizen@1
 > 
